@@ -57,7 +57,7 @@ countryName = Country
 stateOrProvinceName_default = $STATE
 stateOrProvinceName = State
 
-localityName_default = Paris
+localityName_default = $LOCALITY
 localityName = Locality
 
 organizationName_default = $ORGANIZATION
