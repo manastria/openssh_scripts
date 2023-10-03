@@ -73,8 +73,16 @@ verify_cert() {
 }
 
 usage() {
+  echo "Ce script génère une clé privée et un certificat auto-signé pour une autorité de certification (CA)."
+  echo "Les paramètres du certificat peuvent être définis dans le fichier de configuration 'cert_config.cfg'."
+  echo ""
   echo "Usage: $0 <nom_du_fichier_certificat>"
-  # ... rest of the message
+  echo ""
+  echo "Arguments :"
+  echo "  <nom_du_fichier_certificat>  Nom du fichier de sortie pour la clé privée et le certificat."
+  echo ""
+  echo "Exemple :"
+  echo "  $0 MonCertificat"
   exit 1
 }
 
