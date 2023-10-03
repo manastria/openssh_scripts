@@ -1,34 +1,36 @@
 #!/bin/bash
 # Fichier gen_ca.sh
 
-set -e # Arrêter le script en cas d'erreur
-set -u # Arrêter le script si une variable non définie est utilisée
-
-handle_error() {
-  echo -e "\033[31mErreur : $1\033[0m" 1>&2
-  exit 1
-}
+# Utilisation de 'set -euo pipefail' pour un script bash plus sûr :
+# -e : Arrête le script si une commande échoue
+# -u : Arrête le script si une variable non définie est utilisée
+# -o pipefail : Le script échoue si une commande dans un pipeline échoue (et pas seulement la dernière commande)
+set -euo pipefail
 
 display_message() {
   # $1 = message type (e.g., Error, Warning), $2 = message
   case "$1" in
-    "Erreur")
-      COLOR="\033[31m"  # Rouge
-      ;;
-    "Attention")
-      COLOR="\033[33m"  # Jaune
-      ;;
-    *)
-      COLOR="\033[0m"   # Par défaut (blanc)
-      ;;
+  "Erreur")
+    COLOR="\033[31m" # Rouge
+    ;;
+  "Attention")
+    COLOR="\033[33m" # Jaune
+    ;;
+  *)
+    COLOR="\033[0m" # Par défaut (blanc)
+    ;;
   esac
-  
+
   echo -e "$COLOR$1: $2\033[0m" 1>&2
 }
 
+handle_error() {
+  display_message "Erreur" "$1"
+  exit 1
+}
 
 verify_openssl_installed() {
-  if ! command -v openssl &> /dev/null; then
+  if ! command -v openssl &>/dev/null; then
     display_message "Erreur" "OpenSSL n'est pas installé."
     exit 1
   fi
@@ -49,6 +51,15 @@ load_config() {
   else
     display_message "Attention" "Le fichier de configuration n'existe pas."
   fi
+
+  # Paramètres du certificat (ces valeurs écraseront les valeurs du fichier de configuration s'il y en a)
+  COUNTRY="${COUNTRY:-FR}"
+  STATE="${STATE:-Ile-de-France}"
+  LOCALITY="${LOCALITY:-Paris}"
+  ORGANIZATION="${ORGANIZATION:-MonOrganisation}"
+  ORG_UNIT="${ORG_UNIT:-IT}"
+  EMAIL="${EMAIL:-admin@example.com}"
+  DAYS="${DAYS:-3650}"
 }
 
 generate_private_key() {
@@ -88,7 +99,7 @@ usage() {
 
 # Verifier si un argument est fourni
 if [ "$#" -ne 1 ]; then
-    usage
+  usage
 fi
 
 CERT_NAME="$1"

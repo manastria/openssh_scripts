@@ -1,6 +1,37 @@
 #!/bin/bash
 # File: sign_csr.sh
 
+# Utilisation de 'set -euo pipefail' pour un script bash plus sûr :
+# -e : Arrête le script si une commande échoue
+# -u : Arrête le script si une variable non définie est utilisée
+# -o pipefail : Le script échoue si une commande dans un pipeline échoue (et pas seulement la dernière commande)
+set -euo pipefail
+
+display_message() {
+  # $1 = message type (e.g., Error, Warning), $2 = message
+  case "$1" in
+    "Erreur")
+      COLOR="\033[31m"  # Rouge
+      ;;
+    "Attention")
+      COLOR="\033[33m"  # Jaune
+      ;;
+    *)
+      COLOR="\033[0m"   # Par défaut (blanc)
+      ;;
+  esac
+  
+  echo -e "$COLOR$1: $2\033[0m" 1>&2
+}
+
+handle_error() {
+  display_message "Erreur" "$1"
+  exit 1
+}
+
+trap 'handle_error "Une erreur est survenue à la ligne $LINENO"' ERR
+
+
 usage() {
     echo "Description :"
     echo "  Ce script permet de signer un Certificate Signing Request (CSR) avec une autorité de certification (CA) spécifiée."
