@@ -1,0 +1,24 @@
+[ req ]
+default_bits = 1024
+distinguished_name  = req_distinguished_name
+string_mask = MASK:0x2002
+utf8 = yes
+prompt = no
+
+[ req_distinguished_name ]
+# Les champs ci-dessous sont des exemples et peuvent être laissés vides dans la pratique
+# si le sujet est spécifié dans la commande.
+C  = FR
+ST = Ile-de-France
+L  = Paris
+O  = MonOrganisation
+OU = IT
+CN = RootCA
+emailAddress = admin@example.com
+
+[ ca_extensions ]
+nsComment = "manastria certificat"
+nsCertType = sslCA, emailCA, objCA
+keyUsage = keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+basicConstraints = critical,CA:TRUE

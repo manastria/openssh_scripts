@@ -1,5 +1,6 @@
 *.pem
 *.csr
 *.cnf
+!openssl.cnf
 *.p12
 *.srl

@@ -44,6 +44,8 @@ openssl genpkey -algorithm RSA -out "${CERT_NAME}_ca_key.pem"
 openssl req -new -x509 -days "$DAYS" \
     -key "${CERT_NAME}_ca_key.pem" \
     -out "${CERT_NAME}_ca_cert.pem" \
-    -subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORG_UNIT/CN=RootCA/emailAddress=$EMAIL"
+    -subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORG_UNIT/CN=RootCA/emailAddress=$EMAIL" \
+    -config ./openssl.cnf \
+    -extensions ca_extensions
 
 echo "Certificat et clé de l'autorité de certification générés avec succès."
