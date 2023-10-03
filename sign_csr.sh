@@ -83,7 +83,7 @@ export_pkcs12() {
         -in "${COMMON_NAME}_cert.pem" \
         -certfile "${COMMON_NAME}_chain.pem" \
         -out "${COMMON_NAME}.p12" \
-        -passout pass:
+        -passout pass:  || handle_error "La génération du certificat a échoué."
 }
 
 main() {
@@ -100,7 +100,7 @@ main() {
     extract_common_name
 
     if [[ -z "${COMMON_NAME}" ]]; then
-        echo "Erreur : Le Common Name du CSR ne peut pas être vide."
+        display_message "Erreur" "Le Common Name du CSR ne peut pas être vide."
         exit 1
     fi
     
