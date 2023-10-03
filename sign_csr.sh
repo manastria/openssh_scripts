@@ -31,7 +31,8 @@ sign_with_ca() {
         -CA "${CA_NAME}_ca_cert.pem" \
         -CAkey "${CA_NAME}_ca_key.pem" \
         -CAcreateserial \
-        -out "${COMMON_NAME}_cert.pem"
+        -out "${COMMON_NAME}_cert.pem" \
+        -days 365 -extfile ${COMMON_NAME}_openssl.cnf -extensions server_ext
     
     cat "${COMMON_NAME}_cert.pem" "${CA_NAME}_ca_cert.pem" > "${COMMON_NAME}_chain.pem"
 }
@@ -66,7 +67,7 @@ main() {
 
     check_dependencies
     extract_common_name
-    
+
     if [[ -z "${COMMON_NAME}" ]]; then
         echo "Erreur : Le Common Name du CSR ne peut pas être vide."
         exit 1

@@ -47,35 +47,44 @@ EMAIL="${EMAIL:-admin@example.com}"
 # Création du fichier de configuration temporaire pour openssl
 cat > ${COMMON_NAME}_openssl.cnf <<EOL
 [req]
+default_bits       = 2048
 distinguished_name = req_distinguished_name
 req_extensions = v3_req
+x509_extensions = v3_req
+string_mask = MASK:0x2002
+utf8 = yes
+prompt = no
 
 [req_distinguished_name]
-countryName_default = $COUNTRY
-countryName = Country
-
-stateOrProvinceName_default = $STATE
-stateOrProvinceName = State
-
-localityName_default = $LOCALITY
-localityName = Locality
-
-organizationName_default = $ORGANIZATION
-organizationName = Organization
-
-organizationalUnitName_default = $ORG_UNIT
-organizationalUnitName = Organizational Unit
-
-commonName_default = $COMMON_NAME
-commonName = Common Name
-
-emailAddress_default = $EMAIL
-emailAddress = Email Address
+0.C=FR
+1.ST=HDF
+2.L=Amiens
+3.O=Lycée
+4.OU=IT
+5.CN=${COMMON_NAME}
+6.emailAddress=toto@toto.com
 
 [v3_req]
-keyUsage = keyEncipherment, dataEncipherment
+nsComment=xca certificate
+nsCertType=server
+extendedKeyUsage=serverAuth
+keyUsage=digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
+subjectKeyIdentifier=hash
+basicConstraints=critical,CA:FALSE
+subjectAltName = @alt_names
+
+[server_ext]
+authorityKeyIdentifier = keyid,issuer
+basicConstraints=critical,CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
 extendedKeyUsage = serverAuth
-subjectAltName = $SAN
+subjectAltName = @alt_names
+nsCertType=server
+nsComment=manastria certificate
+
+[alt_names]
+DNS.1   = ${COMMON_NAME}
+DNS.2   = www.${COMMON_NAME}
 EOL
 
 # Génération de la clé privée
@@ -97,11 +106,11 @@ if [ $? -ne 0 ]; then
 fi
 
 # Nettoyage du fichier de configuration temporaire
-rm ${COMMON_NAME}_openssl.cnf
-if [ $? -ne 0 ]; then
-    echo "Erreur lors de la suppression du fichier de configuration temporaire."
-    exit 1
-fi
+#rm ${COMMON_NAME}_openssl.cnf
+#if [ $? -ne 0 ]; then
+#    echo "Erreur lors de la suppression du fichier de configuration temporaire."
+#    exit 1
+#fi
 
 echo "CSR et clé privée générées avec succès."
 
