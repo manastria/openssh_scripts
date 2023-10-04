@@ -1,6 +1,37 @@
 #!/bin/bash
 # File: sign_csr.sh
 
+# Utilisation de 'set -euo pipefail' pour un script bash plus sûr :
+# -e : Arrête le script si une commande échoue
+# -u : Arrête le script si une variable non définie est utilisée
+# -o pipefail : Le script échoue si une commande dans un pipeline échoue (et pas seulement la dernière commande)
+set -euo pipefail
+
+display_message() {
+  # $1 = message type (e.g., Error, Warning), $2 = message
+  case "$1" in
+    "Erreur")
+      COLOR="\033[31m"  # Rouge
+      ;;
+    "Attention")
+      COLOR="\033[33m"  # Jaune
+      ;;
+    *)
+      COLOR="\033[0m"   # Par défaut (blanc)
+      ;;
+  esac
+  
+  echo -e "$COLOR$1: $2\033[0m" 1>&2
+}
+
+handle_error() {
+  display_message "Erreur" "$1"
+  exit 1
+}
+
+trap 'handle_error "Une erreur est survenue à la ligne $LINENO"' ERR
+
+
 usage() {
     echo "Description :"
     echo "  Ce script permet de signer un Certificate Signing Request (CSR) avec une autorité de certification (CA) spécifiée."
@@ -31,7 +62,8 @@ sign_with_ca() {
         -CA "${CA_NAME}_ca_cert.pem" \
         -CAkey "${CA_NAME}_ca_key.pem" \
         -CAcreateserial \
-        -out "${COMMON_NAME}_cert.pem"
+        -out "${COMMON_NAME}_cert.pem" \
+        -days 365 -extfile ${COMMON_NAME}_openssl.cnf -extensions server_ext
     
     cat "${COMMON_NAME}_cert.pem" "${CA_NAME}_ca_cert.pem" > "${COMMON_NAME}_chain.pem"
 }
@@ -51,7 +83,7 @@ export_pkcs12() {
         -in "${COMMON_NAME}_cert.pem" \
         -certfile "${COMMON_NAME}_chain.pem" \
         -out "${COMMON_NAME}.p12" \
-        -passout pass:
+        -passout pass:  || handle_error "La génération du certificat a échoué."
 }
 
 main() {
@@ -66,9 +98,9 @@ main() {
 
     check_dependencies
     extract_common_name
-    
+
     if [[ -z "${COMMON_NAME}" ]]; then
-        echo "Erreur : Le Common Name du CSR ne peut pas être vide."
+        display_message "Erreur" "Le Common Name du CSR ne peut pas être vide."
         exit 1
     fi
     
