@@ -63,7 +63,7 @@ sign_with_ca() {
         -CAkey "${CA_NAME}_ca_key.pem" \
         -CAcreateserial \
         -out "${COMMON_NAME}_cert.pem" \
-        -days 365 -extfile ${COMMON_NAME}_openssl.cnf -extensions server_ext
+        -days 365 -extfile "${COMMON_NAME}_openssl.cnf" -extensions server_ext
     
     cat "${COMMON_NAME}_cert.pem" "${CA_NAME}_ca_cert.pem" > "${COMMON_NAME}_chain.pem"
 }
